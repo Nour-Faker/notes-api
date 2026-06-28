@@ -1,6 +1,7 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends,UploadFile,File
 from sqlalchemy.orm import Session
 from typing import List
+import os
 
 import models
 import schemas
@@ -23,6 +24,32 @@ def get_db():
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+ALLOWED_EXTENSIONS = {".txt", ".pdf"}
+MAX_SIZE_BYTES = 1 * 1024 * 1024  # 1MB
+
+@app.post("/upload", status_code=201)
+async def upload_file(file: UploadFile = File(...)):
+    ext = os.path.splitext(file.filename)[1].lower()
+    if ext not in ALLOWED_EXTENSIONS:
+        raise HTTPException(status_code=400, detail="Only .txt and .pdf files allowed")
+
+    content = await file.read()
+
+    if len(content) > MAX_SIZE_BYTES:
+        raise HTTPException(status_code=400, detail="File too large. Max 1MB")
+
+    if ext == ".txt":                                        
+        preview = content.decode("utf-8", errors="ignore")[:200]
+    else:
+        preview = "PDF preview not supported yet"
+
+    return {                                                 
+        "filename": file.filename,
+        "size_bytes": len(content),
+        "content_type": file.content_type,
+        "preview": preview
+    }
 
 @app.post("/notes", response_model=schemas.NoteResponse, status_code=201)
 def create_note(note: schemas.NoteCreate, db: Session = Depends(get_db)):
