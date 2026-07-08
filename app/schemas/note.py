@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 from typing import Optional
 
@@ -13,6 +13,8 @@ class NoteUpdate(BaseModel):
     tag: Optional[str] = None
 
 class NoteResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     title: str
     content: str
@@ -20,6 +22,4 @@ class NoteResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
     owner_id: int
-
-    class Config:
-        from_attributes = True
+    

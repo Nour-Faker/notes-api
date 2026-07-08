@@ -9,7 +9,7 @@ import os
 # Use a separate test database — never pollute production data
 TEST_DATABASE_URL = os.getenv(
     "TEST_DATABASE_URL",
-    "postgresql://postgres:postgres123@localhost:5432/smartnotes_test"
+    "postgresql://postgres:postgres1234@localhost:5432/smartnotes_test"
 )
 engine = create_engine(TEST_DATABASE_URL)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
