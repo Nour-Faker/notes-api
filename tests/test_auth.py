@@ -35,3 +35,41 @@ def test_login_wrong_password(client, registered_user):
         "password": "wrongpassword"
     })
     assert response.status_code == 401
+def test_pagination(client, auth_headers):
+    # Create 3 notes
+    for i in range(3):
+        client.post("/api/v1/notes/", json={
+            "title": f"Note {i}", "content": f"Content {i}"
+        }, headers=auth_headers)
+
+    # Get first 2
+    response = client.get("/api/v1/notes/?skip=0&limit=2", headers=auth_headers)
+    assert response.status_code == 200
+    assert len(response.json()) == 2
+
+    # Get last 1
+    response = client.get("/api/v1/notes/?skip=2&limit=2", headers=auth_headers)
+    assert response.status_code == 200
+    assert len(response.json()) == 1
+
+def test_search(client, auth_headers):
+    client.post("/api/v1/notes/", json={
+        "title": "FastAPI guide", "content": "How to build APIs"
+    }, headers=auth_headers)
+    client.post("/api/v1/notes/", json={
+        "title": "Docker tutorial", "content": "Containerization basics"
+    }, headers=auth_headers)
+
+    # Search by title
+    response = client.get("/api/v1/notes/?search=FastAPI", headers=auth_headers)
+    assert len(response.json()) == 1
+    assert response.json()[0]["title"] == "FastAPI guide"
+
+    # Search by content
+    response = client.get("/api/v1/notes/?search=Containerization", headers=auth_headers)
+    assert len(response.json()) == 1
+    assert response.json()[0]["title"] == "Docker tutorial"
+
+    # Search with no match
+    response = client.get("/api/v1/notes/?search=kubernetes", headers=auth_headers)
+    assert len(response.json()) == 0

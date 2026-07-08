@@ -20,17 +20,28 @@ def create_note(
     db.refresh(new_note)
     return new_note
 
+
 @router.get("/", response_model=List[NoteResponse])
 def get_notes(
     tag: Optional[str] = None,
+    search: Optional[str] = None,
+    skip: int = 0,
+    limit: int = 10,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     query = db.query(Note).filter(Note.owner_id == current_user.id)
+    
     if tag:
         query = query.filter(Note.tag == tag)
-    return query.all()
-
+    
+    if search:
+        query = query.filter(
+            Note.title.ilike(f"%{search}%") |
+            Note.content.ilike(f"%{search}%")
+        )
+    
+    return query.offset(skip).limit(limit).all()
 @router.get("/{note_id}", response_model=NoteResponse)
 def get_note(
     note_id: int,
