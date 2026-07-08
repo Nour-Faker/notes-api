@@ -1,3 +1,4 @@
+![CI](https://github.com/Nour-Faker/notes-api/actions/workflows/ci.yml/badge.svg)
 # SmartNotes API 🌸
 
 A production-grade REST API for personal note management — built from scratch with FastAPI, PostgreSQL, JWT authentication, Docker, Alembic migrations, and a full pytest test suite.
