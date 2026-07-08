@@ -1,12 +1,12 @@
 from fastapi import FastAPI
 from app.config.database import engine, Base
-
-# Import ALL models here so Base knows about them before create_all
-from app.models import user, note  # ← this line is critical
-
+from app.models import user, note
 from app.routers import auth, notes
 
-Base.metadata.create_all(bind=engine)
+try:
+    Base.metadata.create_all(bind=engine)
+except Exception as e:
+    print(f"Warning: Could not create tables: {e}")
 
 app = FastAPI(title="SmartNotes API 🌸")
 
