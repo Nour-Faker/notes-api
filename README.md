@@ -480,8 +480,4 @@ Building toward AI engineering, one production system at a time.
 
 ## License
 
-<<<<<<< Updated upstream
 MIT
-=======
-MIT
->>>>>>> Stashed changes
